@@ -6,7 +6,6 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Users\georg\Downloads\My programs-p
 
 #Enter PDF path that you want  to copy
 PDFpath = str(input(r"Enter PDF file path: "))
-# "C:\Users\georg\Downloads\OG Έγγραφα\100DaysOfPython\pdf&others\Syllabus+for+100+Days+of+Python.pdf"
 
 #Enter the file name that final text will be wrote down
 fileName = str(input("Enter file name: "))
