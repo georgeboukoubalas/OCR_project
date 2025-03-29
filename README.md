@@ -23,4 +23,6 @@ updated will be follow in feture for many new additions and dibuging
 DO NO be hasitate to leave me a comment if you find any trable or for fixies it will be help me a lot
 https://www.youtube.com/watch?v=xvFZjo5PgG0
 
+forgot to mention i have worked in windows 11home (NO ANY KIND OF LINUX REQUIRED TO HAVE<3)
+
 
