@@ -5,6 +5,36 @@ import os
 import chardet
 import fitz # PyMuPDF
 from FileManager import move
+import re
+
+def cleaning_text(text: str):
+    # Normalize newlines first
+    text = re.sub(r"\r\n|\r", "\n", text)
+
+    # Remove long lines of symbols or non-alphanumerics (fake dividers, OCR junk)
+    text = re.sub(r"[^Α-Ωα-ωΆ-ώA-Za-z0-9\s.,;:?!@%&/()\"'\[\]\-+=€$£<>|{}\n]", "", text)
+
+    # Remove repeated garbage sequences (e.g. "οοοοοο", "τττττ", etc.)
+    text = re.sub(r"([^\W\d_])\1{3,}", r"\1", text)
+
+    # Fix common OCR errors
+    text = text.replace("|||", " | ")
+    text = text.replace("||", " | ")
+    text = text.replace(" .", ".")
+    text = text.replace(" ,", ",")
+    text = text.replace(" :", ":")
+    text = text.replace(" ;", ";")
+    text = text.replace("..", ".")
+
+    # Clean extra whitespace
+    text = re.sub(r"\s{2,}", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    text = re.sub(r"\n\s*\n", "\n\n", text)
+
+    # Strip leading/trailing whitespace
+    text = text.strip()
+
+    return text
 
 def detect_pdf_encoding(pdf_path):
     # open pdf
@@ -53,7 +83,9 @@ def main():
     with open(file_name + ".txt", "w", encoding=encoding, errors="replace") as file:
     # Extract word from every page
         for page_num, img in enumerate(pages):
-            text = pytesseract.image_to_string(img, lang='eng')
+            text = pytesseract.image_to_string(img, lang='ell+eng')
+            #Clean the garbage from the text
+            text = cleaning_text(text)
             #erase the empty lines
             text = "\n".join([line for line in text.split("\n") if line.strip()])
             file.write(f'\n--- Page {page_num + 1} --- \n')
