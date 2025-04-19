@@ -44,7 +44,7 @@ def main():
     file_name = input("Enter a file name: ")
 
     filename_path = r"C:\Users\georg\PycharmProjects\OCR_project\\" + file_name + ".txt"
-    destination_dir_path = r"C:\Users\georg\PycharmProjects\OCR_project\Extracted_txts\\"
+    destination_dir_path = r"C:\Users\georg\PycharmProjects\OCR_project\Extracted_txts"
 
     # Convert PDF to a list of images
     pages = convert_from_path(pdf_path, 300)
