@@ -59,13 +59,12 @@ def restore():
         print("No files to restore.")
 
 def folder_creator():
-    dir_path = input("Enter the destination path of the folder that file gonna move: ")
+    dir_path = r"Extracted_txts"
 
-    if os.path.isdir(dir_path):
-        print("Directory already exists.")
-    else:
+    if not os.path.isdir(dir_path):
         os.makedirs(dir_path)
         print("Directory created successfully!")
+
 
     return dir_path
 
