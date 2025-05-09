@@ -3,48 +3,8 @@ import pytesseract
 import chardet
 import fitz # PyMuPDF
 from FileManager import move, folder_creator
-import re
+from ExtractorManager import preprocessing, postprocessing, cleaning_text, crop_to_roi
 import os
-
-def cleaning_text(text: str) -> str:
-    """
-    Cleans the input text by normalizing newlines, removing long lines of symbols or non-alphanumerics,
-    repeated garbage sequences, fixing common OCR errors, cleaning extra whitespace, and stripping leading/trailing whitespace.
-
-    Args:
-        text (str): The input text to be cleaned.
-
-    Returns:
-        str: The cleaned text.
-    """
-
-    # Normalize newlines first
-    text = re.sub(r"\r\n|\r", "\n", text)
-
-    # Remove long lines of symbols or non-alphanumerics (fake dividers, OCR junk)
-    text = re.sub(r"[^\w\s.,;:?!@%&/()\"'\[\]\-+=€$\u00a3<>|{}\n]", "", text)
-
-    # Remove repeated garbage sequences (e.g. "οοοοοο", "τττττ", etc.)
-    text = re.sub(r"([^\W\d_])\1{3,}", r"\1", text)
-
-    # Fix common OCR errors
-    text = text.replace("|||", " | ")
-    text = text.replace("||", " | ")
-    text = text.replace(" .", ".")
-    text = text.replace(" ,", ",")
-    text = text.replace(" :", ":")
-    text = text.replace(" ;", ";")
-    text = text.replace("..", ".")
-
-    # Clean extra whitespace
-    text = re.sub(r"\s{2,}", " ", text)
-    text = re.sub(r"\n{3,}", "\n\n", text)
-    text = re.sub(r"\n\s*\n", "\n\n", text)
-
-    # Strip leading/trailing whitespace
-    text = text.strip()
-
-    return text
 
 def detect_pdf_encoding(pdf_path):
     try:
@@ -65,14 +25,18 @@ def detect_pdf_encoding(pdf_path):
 
 def image_to_text(image_path, lang='ell+eng'):
     try:
-        return pytesseract.image_to_string(image_path, lang=lang)
+        custom_config = r'--oem 1 --psm 3'
+        return pytesseract.image_to_string(image_path, lang=lang, config=custom_config)
     except Exception as e:
         print(f"Error during OCR: {e}")
         return ""
 
+
 def main():
+    #pytesseract version: python -c "import pytesseract; print(pytesseract.__version__)"
+
     #Find tesseract.exe path
-    pytesseract.pytesseract.tesseract_cmd = r"C:\Users\georg\Downloads\My programs-project\llm data analysis project\tesseract.exe"
+    #pytesseract.pytesseract.tesseract_cmd = r"C:\Users\georg\Downloads\My programs-project\llm data analysis project\tesseract.exe"
     #pytesseract.pytesseract.tesseract_cmd = r".\tesseract.exe"
 
     #Enter PDF path that you want  to copy
@@ -95,16 +59,21 @@ def main():
     destination_dir_path = folder_creator()
 
     # Convert PDF to a list of images
-    pages = convert_from_path(pdf_path, 350)
+    pages = convert_from_path(pdf_path, 400)
 
     #Open file for writing
     with open(file_name + ".txt", "w", encoding=encoding, errors="replace") as file:
     # Extract word from every page
-        for page_num, img in enumerate(pages):
-            text = image_to_text(img)
+        for page_num, pil_img in enumerate(pages):
+
+            #bw = preprocessing(pil_img)
+            cropped = crop_to_roi(pil_img)
+            #Extract text from the image
+            text = image_to_text(cropped)
 
             #Clean the garbage from the text
             text = cleaning_text(text)
+            #text = postprocessing(text)
 
             #erase the empty lines
             text = "\n".join([line for line in text.split("\n") if line.strip()])
