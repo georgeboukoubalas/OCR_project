@@ -3,7 +3,7 @@ import pytesseract
 import chardet
 import fitz # PyMuPDF
 from FileManager import move, folder_creator
-from ExtractorManager import preprocessing, postprocessing, cleaning_text, crop_to_roi
+from ExtractorManager import preprocessing, postprocessing, cleaning_text, crop_to_roi, process_txt_with_characterspliting
 import os
 
 def detect_pdf_encoding(pdf_path):
@@ -31,7 +31,6 @@ def image_to_text(image_path, lang='ell+eng'):
         print(f"Error during OCR: {e}")
         return ""
 
-
 def main():
     #pytesseract version: python -c "import pytesseract; print(pytesseract.__version__)"
 
@@ -41,7 +40,7 @@ def main():
 
     #Enter PDF path that you want  to copy
     #pdf_path = input(r"Enter PDF file path: ")
-    pdf_path = input(r"PDF path: ")
+    pdf_path = input(r"PDF path: ").replace('"', '').replace("'", '')
     #check if file was found in path
     if not os.path.exists(pdf_path):
         print(f"file not found: {pdf_path}")
@@ -66,20 +65,21 @@ def main():
     # Extract word from every page
         for page_num, pil_img in enumerate(pages):
 
-            #bw = preprocessing(pil_img)
+            #crop the image to the region of interest (ROI)
             cropped = crop_to_roi(pil_img)
+
             #Extract text from the image
             text = image_to_text(cropped)
 
             #Clean the garbage from the text
             text = cleaning_text(text)
-            #text = postprocessing(text)
 
             #erase the empty lines
             text = "\n".join([line for line in text.split("\n") if line.strip()])
             file.write(f'\n--- Page {page_num + 1} --- \n')
             file.write(text)
 
+    process_txt_with_characterspliting(filename_path, encoding)
     move(filename_path, destination_dir_path)
 
 if __name__ == "__main__":

@@ -141,7 +141,146 @@ def crop_to_roi(img):
     roi = img[y:y + h, x:x + w]
     return roi
 
+def charactersplitting(text):
+    import unicodedata
+    import re
+
+    # 1. Normalize Unicode (διορθώνει περίεργους χαρακτήρες όπως 'µ' → 'μ')
+    text = unicodedata.normalize("NFKC", text)
+
+    # 2. Λίστα με κοινές μικρές ελληνικές λέξεις που κολλάνε συχνά
+    common_short_words = ['του', 'την', 'τον', 'της', 'στο', 'στη', 'στα', 'και', 'που', 'σε', 'με', 'ως', 'για', 'τα', 'ο', 'η', 'το']
+    all_variants = common_short_words + [w.capitalize() for w in common_short_words]
+
+    # 3. Regex: βρίσκουμε κολλημένες λέξεις όπως δικαιώματατου → δικαιώματα του
+    for word in all_variants:
+        pattern = r'(?<=[\u0370-\u03FF])(' + word + r')(?=[\u0370-\u03FF])'
+        text = re.sub(pattern, r' \1', text)
+
+    # 4. Καθαρίζουμε διπλά κενά
+    text = re.sub(r'\s+', ' ', text)
+
+    return text.strip()
 
 
+def process_txt_with_characterspliting(file_path, enc):
+    import os
+
+    # Check if file exists
+    if not os.path.exists(file_path):
+        print(f"File not found: {file_path}")
+        return
+
+    # Read the original content
+    with open(file_path, "r", encoding=enc, errors="replace") as f:
+        original_text = f.read()
+
+    # Apply character splitting
+    cleaned_text = wordsplitting(original_text)
+
+    # Overwrite the file with the cleaned version
+    with open(file_path, "w", encoding=enc, errors="replace") as f:
+        f.write(cleaned_text)
+
+    print(f"✅ File cleaned and updated with character splitting: {file_path}")
+
+
+# 📚 Load lexicon only once (pass this to the function if needed)
+def load_lexicon(path='ell.txt'):
+    with open(path, 'r', encoding='utf-8') as f:
+        return set(word.strip().lower() for word in f if word.strip())
+
+# 🧠 Smart splitter function with lexicon
+def smart_split(word, lexicon):
+    word = word.lower()
+    n = len(word)
+
+    # Dynamic Programming table
+    dp = [None] * (n + 1)
+    dp[0] = []
+
+    for i in range(1, n + 1):
+        for j in range(i):
+            if dp[j] is not None and word[j:i] in lexicon:
+                dp[i] = dp[j] + [word[j:i]]
+                break
+
+    return dp[n] if dp[n] is not None else [word]
+
+
+# 🔤 Word splitting main function
+def wordsplitting(text):
+    import re
+
+    lexicon_path = r"C:\Users\georg\PycharmProjects\OCR_project\.venv\Lib\site-packages\splitwords\dicts\ell.txt"
+    lexicon = load_lexicon(lexicon_path)
+
+    pat = re.compile(r"([.()!?,«»:;\"“”])")  # add more punctuation if needed
+    text = pat.sub(" \\1 ", text)
+
+    new_paragraph = []
+
+    for word in text.split():
+        clean_w = word.strip()
+        # Skip very short words or already known words
+        if len(clean_w) <= 3 or clean_w.lower() in lexicon:
+            new_paragraph.append(clean_w)
+            continue
+
+        split_words = smart_split(clean_w, lexicon)
+
+        # Safety check – skip weird splits
+        if ''.join(split_words).lower() == clean_w.lower() or len(split_words) == 1:
+            new_paragraph.append(clean_w)
+        else:
+            new_paragraph.extend(split_words)
+
+    result = ' '.join(new_paragraph)
+    result = result.replace(" .", ".").replace(" !", "!").replace(" ?", "?")
+    return result
+
+def better_wordsplitting(text):
+    from splitwords import Splitter
+    import re
+
+    txt = r"C:\Users\georg\PycharmProjects\OCR_project\.venv\Lib\site-packages\splitwords\dicts\ell.txt"
+    # Φόρτωσε τις λέξεις από το λεξικό
+    with open(txt, "r", encoding="utf-8") as f:
+        greek_words = set(w.strip().lower() for w in f if w.strip())
+
+    splitter = Splitter(languages=['ell', 'en'])
+    pat = re.compile(r"([.()!])")
+    paragraph = pat.sub(" \\1 ", text)
+
+    def smart_split(word):
+        word = word.lower()
+        if word in greek_words:
+            return [word]  # Η λέξη είναι ολόκληρη σωστή
+
+        # Προσπάθησε να τη χωρίσεις σε λέξεις του λεξικού
+        for i in range(1, len(word)):
+            left = word[:i]
+            right = word[i:]
+            if left in greek_words and right in greek_words:
+                return [left, right]  # Βρήκε δύο κολλημένες λέξεις
+
+        # Χρησιμοποίησε το Splitter
+        result = splitter.split(word.upper())
+        joined = ''.join(result).lower()
+
+        if joined == word or len(result) == 1:
+            return [word]
+        return [w.lower() for w in result]
+
+    new_paragraph = []
+
+    for w in paragraph.split():
+        clean_w = w.strip()
+        split_words = smart_split(clean_w)
+        new_paragraph.extend(split_words)
+
+    final_text = ' '.join(new_paragraph)
+    final_text = final_text.replace(' .', '.')
+    return final_text
 
 
