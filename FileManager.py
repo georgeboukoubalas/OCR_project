@@ -1,6 +1,6 @@
 import os
 import shutil
-
+from tkinter import messagebox
 
 def main():
     destination_dir_path = folder_creator()
@@ -43,9 +43,11 @@ def move(file_path, destination_dir):
     # Μετακίνηση του αρχείου
     try:
         shutil.move(file_path, destination_path)
-        print(f"✅ File moved successfully to: {destination_path}")
+        messagebox.showinfo(title=file_name, message = f"✅ File moved successfully to: {destination_path}")
+        #print(f"✅ File moved successfully to: {destination_path}")
     except Exception as e:
-        print(f"❌ Error while moving file: {e}")
+        messagebox.showinfo(title=file_name, message=f"❌ Error while moving file: {e}")
+        #print(f"❌ Error while moving file: {e}")
 
 def restore():
     with open('quar_id.txt') as f:

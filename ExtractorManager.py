@@ -165,6 +165,7 @@ def charactersplitting(text):
 
 def process_txt_with_characterspliting(file_path, enc):
     import os
+    from tkinter import messagebox
 
     # Check if file exists
     if not os.path.exists(file_path):
@@ -181,8 +182,7 @@ def process_txt_with_characterspliting(file_path, enc):
     # Overwrite the file with the cleaned version
     with open(file_path, "w", encoding=enc, errors="replace") as f:
         f.write(cleaned_text)
-
-    print(f"✅ File cleaned and updated with character splitting: {file_path}")
+    #print(f"✅ File cleaned and updated with character splitting: {file_path}")
 
 
 # 📚 Load lexicon only once (pass this to the function if needed)
