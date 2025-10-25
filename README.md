@@ -35,7 +35,7 @@ WHAT YOU NEED!!!
 HOW TO RUN!!!
 
 --- Following Commands Work In Powershell As Administrator ---
-1. git clone https://github.com/<your-username>/<your-repo>.git
+1. git clone "https://github.com/<your-username>/<your-repo>.git"
 2. cd <your-repo>
 3. py -3.10 -m venv .venv
 4. .venv\Scripts\activate
