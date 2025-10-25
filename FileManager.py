@@ -1,7 +1,3 @@
-import os
-import shutil
-from tkinter import messagebox
-
 def main():
     destination_dir_path = folder_creator()
     choice = input("Would you like to (M)ove or (R)estore?: ")
@@ -20,9 +16,14 @@ def main():
 
 
 def move(file_path, destination_dir):
+    import os
+    import shutil
+    from tkinter import messagebox
+
     # Έλεγχος αν το αρχείο υπάρχει
     if not os.path.isfile(file_path):
         print(f"❌ File not found: {file_path}")
+        messagebox.showerror(title="Error", message=f"file not found!!!")
         return
 
     """# Δημιουργία του φακέλου προορισμού αν δεν υπάρχει
@@ -39,7 +40,7 @@ def move(file_path, destination_dir):
 
     # Δημιουργία του πλήρους path προορισμού
     destination_path = os.path.join(destination_dir, file_name)
-
+    messagebox.showinfo(title="Directory", message=f"Destination directory created: {destination_path}")
     # Μετακίνηση του αρχείου
     try:
         shutil.move(file_path, destination_path)
@@ -50,6 +51,9 @@ def move(file_path, destination_dir):
         #print(f"❌ Error while moving file: {e}")
 
 def restore():
+    import os
+    import shutil
+
     with open('quar_id.txt') as f:
         quar_id = f.readline().strip()
 
@@ -61,12 +65,15 @@ def restore():
         print("No files to restore.")
 
 def folder_creator():
+    from tkinter import messagebox
+    import os
+
     dir_path = r"Extracted_txts"
 
     if not os.path.isdir(dir_path):
         os.makedirs(dir_path)
         print("Directory created successfully!")
-
+        messagebox.showinfo(title="Directory", message=f"Directory Extracted_txts created successfully!")
 
     return dir_path
 

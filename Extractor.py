@@ -87,8 +87,10 @@ def main():
             process_txt_with_characterspliting(filename_path, encoding)
             move(filename_path, destination_dir_path)
         except FileNotFoundError:
-            messagebox.showinfo(title="Error", message="Oops!!! \nSeems you might be used invalid characters in files name \nPlease make no use of characters like / , // , * ")
+            # I do not Know why but the message box below doesn't work need fix, fake FileNotFoundError occure but the code in try is steel worked ???
+            # messagebox.showinfo(title="Error", message="Oops!!! \nSeems you might be used invalid characters in files name \nPlease make no use of characters like / , // , * ")
             File_Name_entry.delete(0, END)
+            move(filename_path, destination_dir_path)
 
 window = Tk()
 window.title("Pdf To Text")
