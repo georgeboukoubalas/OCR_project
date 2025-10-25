@@ -25,4 +25,25 @@ https://www.youtube.com/watch?v=xvFZjo5PgG0
 
 forgot to mention i have worked in windows 11home (NO ANY KIND OF LINUX REQUIRED TO HAVE<3)
 
+WHAT YOU NEED!!!
+
+1. Python 3.10.x
+2. Pip
+3. Windows with avalable python Python 3.10
+4. PyCharm or vscode do the work best
+
+HOW TO RUN!!!
+
+--- Following Commands Work In Powershell As Administrator ---
+1. git clone https://github.com/<your-username>/<your-repo>.git
+2. cd <your-repo>
+3. py -3.10 -m venv .venv
+4. .venv\Scripts\activate
+   ( If you see error run 'Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass' first)
+5. pip install -r requirements.txt
+6. python Extractor.py
+
+
+   
+
 
