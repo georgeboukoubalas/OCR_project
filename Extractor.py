@@ -4,7 +4,7 @@ import chardet
 import fitz # PyMuPDF
 from FileManager import move, folder_creator
 from ExtractorManager import preprocessing, postprocessing, cleaning_text, crop_to_roi, process_txt_with_characterspliting
-from WordSplitingFileTest import simplemodel
+from WordSplitingFileTest import simplemodel, smart_spacing
 import os
 from tkinter import *
 from tkinter import messagebox
@@ -83,7 +83,7 @@ def main():
                     #erase the empty lines
                     text = "\n".join([line for line in text.split("\n") if line.strip()])
                     file.write(f'\n--- Page {page_num + 1} --- \n')
-                    text = simplemodel(text, lang='el-GR')
+                    text = smart_spacing(text, lang='el')
                     file.write(text)
 
             process_txt_with_characterspliting(filename_path, encoding)
